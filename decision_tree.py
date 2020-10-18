@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import random
 
 
 class DecisionTreeElement:
@@ -10,25 +11,28 @@ class DecisionTreeElement:
 
 
 class DecisionTree:
-    def __init__(self, min_samples=2, max_depth=None):
+    def __init__(self, min_samples=2, max_depth=None, random_subspace=None):
         self.min_samples = min_samples
         self.max_depth = max_depth
+        self.random_subspace = random_subspace
 
-    def fit(self, X_train, y_train):
-        self.X_train = X_train
+    def fit(self, x_train, y_train):
+        self.x_train = x_train
         self.y_train = y_train
-        data = pd.concat([X_train, y_train], axis=1)
+        data = pd.concat([x_train, y_train], axis=1)
         self.feature_types = self.get_type_of_features(data)
         self.tree = self.algorithm(data, self.min_samples, self.max_depth)
 
-    def predict(self, X_test):
-        X_test.reset_index(inplace=True, drop=True)
+    def predict(self, x_test):
+        x_test.reset_index(inplace=True, drop=True)
         predictions = []
-        for i in range(len(X_test)):
-            predictions.append(self.predict_sample(self.tree, X_test.iloc[i, :]))
-        return predictions
+        for i in range(len(x_test)):
+            predictions.append(self.predict_sample(self.tree, x_test.iloc[i, :]))
+        return pd.DataFrame(predictions)
 
     def predict_sample(self, base_tree, element):
+        if type(base_tree).__name__ != "DecisionTreeElement":
+            return base_tree
         # Question example: A <= 0.2
         question, operator, value = base_tree.question.split(' ')
         if operator == '<=':
@@ -83,7 +87,11 @@ class DecisionTree:
 
     def potential_splits(self, data):
         splits = {}
-        for i in range(len(data.columns) - 1):
+        columns = range(len(data.columns) - 1)
+        # If random_subspace is selected for Random Forest
+        if self.random_subspace is not None and self.random_subspace <= len(columns):
+            columns = random.sample(columns, self.random_subspace)
+        for i in columns:
             # Sorts unique sequential data points
             values = np.sort(np.unique(data.iloc[:, i]))
             if self.feature_types[i] == 'continuous' and len(values) > 1:
