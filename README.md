@@ -21,9 +21,9 @@ Decision Tree models where the target variable can take a discrete set of values
 Random Forests are an ensemble learning method for classification, regression and other tasks that operate by constructing a multitude of decision trees at training time and outputting the class that is the mode of the classes (classification) or mean/average prediction (regression) of the individual trees.
 
 ## Details About UI
-- UI is created with using [streamlit](https://github.com/streamlit/streamlit) library
+- UI created by using [streamlit](https://github.com/streamlit/streamlit) library
 - UI includes data preview, data statistics and classification parts
-- You can start app with using command in the below
+- You can start the app by using command below
 ```
     streamlit run app.py
 ```
